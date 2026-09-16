@@ -1,0 +1,200 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --brand-navy: #073B5C;
+    --brand-navy-dark: #04243A;
+    --brand-navy-light: #0B4C74;
+    --brand-blue: #0D5C91;
+    --brand-teal: #16B8B3;
+    --brand-teal-light: #48D4D2;
+    --brand-cyan: #48D4D2;
+    --brand-bg: #FFFFFF;
+    --brand-bg-soft: #F3F9FB;
+    --brand-bg-alt: #EBF4F7;
+    --brand-text: #102A43;
+    --brand-text-muted: #334E68;
+    --brand-border: #D9E2EC;
+    --brand-border-focus: #16B8B3;
+    --font-cormorant-fallback: 'Cormorant Garamond', Garamond, Georgia, serif;
+    --font-manrope-fallback: 'Manrope', system-ui, -apple-system, sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color: #102A43;
+    background-color: #FFFFFF;
+    font-family: var(--font-manrope), var(--font-manrope-fallback);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  body {
+    background-color: var(--brand-bg);
+    color: var(--brand-text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-family: var(--font-manrope), var(--font-manrope-fallback);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Headings use Cormorant Garamond */
+  h1, h2, h3, h4, h5, h6, .font-display, .font-heading {
+    font-family: var(--font-cormorant), var(--font-cormorant-fallback);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  /* Body, Navigation, Buttons, Forms use Manrope */
+  p, span, a, button, input, textarea, select, label, nav, table, .font-body {
+    font-family: var(--font-manrope), var(--font-manrope-fallback);
+  }
+}
+
+/* Typography Utility Classes */
+.font-editorial {
+  font-family: var(--font-cormorant), var(--font-cormorant-fallback);
+}
+
+.font-scientific {
+  font-family: var(--font-manrope), var(--font-manrope-fallback);
+}
+
+.label-scientific {
+  font-family: var(--font-manrope), var(--font-manrope-fallback);
+  font-size: 0.75rem; /* 12px */
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 600;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F3F9FB;
+}
+::-webkit-scrollbar-thumb {
+  background: #BCCCDC;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #829AB1;
+}
+
+/* Scientific Grid Texture */
+.bg-scientific-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(22, 184, 179, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(22, 184, 179, 0.05) 1px, transparent 1px);
+}
+
+.bg-dot-pattern {
+  background-size: 24px 24px;
+  background-image: radial-gradient(rgba(7, 59, 92, 0.08) 1px, transparent 1px);
+}
+
+/* Pharmaceutical Glass / Card Effects */
+.pharma-card {
+  background: #FFFFFF;
+  border: 1px solid #D9E2EC;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pharma-card:hover {
+  border-color: #16B8B3;
+  box-shadow: 0 14px 35px -10px rgba(7, 59, 92, 0.12);
+}
+
+.pharma-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-family: var(--font-manrope), var(--font-manrope-fallback);
+}
+
+/* Radiant Scientific Cleanroom Illumination Glow */
+.glow-aperture {
+  background: radial-gradient(
+    circle at center,
+    rgba(243, 249, 251, 0.98) 0%,
+    rgba(243, 249, 251, 0.85) 30%,
+    rgba(22, 184, 179, 0.25) 60%,
+    rgba(7, 59, 92, 0) 85%
+  );
+}
+
+.glow-teal {
+  box-shadow: 0 0 35px rgba(22, 184, 179, 0.35);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 45px rgba(72, 212, 210, 0.4);
+}
+
+/* Keyframe animations */
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); }
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 4s ease-in-out infinite;
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-float-slow {
+  animation: floatSlow 6s ease-in-out infinite;
+}
+
+@keyframes wingFlapLeft {
+  0%, 100% { transform: rotateY(0deg) skewY(0deg); }
+  50% { transform: rotateY(55deg) skewY(-5deg); }
+}
+
+@keyframes wingFlapRight {
+  0%, 100% { transform: rotateY(0deg) skewY(0deg); }
+  50% { transform: rotateY(-55deg) skewY(5deg); }
+}
+
+.wing-left {
+  transform-origin: right center;
+  animation: wingFlapLeft 0.35s ease-in-out infinite;
+}
+
+.wing-right {
+  transform-origin: left center;
+  animation: wingFlapRight 0.35s ease-in-out infinite;
+}
+
+.wing-rest-left {
+  transform-origin: right center;
+  animation: wingFlapLeft 3.5s ease-in-out infinite;
+}
+
+.wing-rest-right {
+  transform-origin: left center;
+  animation: wingFlapRight 3.5s ease-in-out infinite;
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
