@@ -15,7 +15,7 @@ export function ButterflyGraphic({
   const gradId2 = useId();
 
   return (
-    <div className={`relative w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center filter drop-shadow-[0_2px_8px_rgba(22,184,179,0.35)] ${className}`}>
+    <div className={`relative w-5 h-5 xs:w-6 xs:h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 flex items-center justify-center filter drop-shadow-[0_1px_5px_rgba(22,184,179,0.35)] ${className}`}>
       {isFlapping && (
         <div className="absolute inset-0 -z-10 rounded-full bg-[#48D4D2]/25 blur-sm animate-ping" />
       )}

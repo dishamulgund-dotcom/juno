@@ -170,11 +170,11 @@ export default function CoverPage({ onEnter }: CoverPageProps) {
 
           {/* PRIMARY HERO HEADLINE — CORMORANT GARAMOND EDITORIAL HIERARCHY */}
           <div 
-            className={`space-y-2 sm:space-y-3 mb-5 sm:mb-8 max-w-2xl px-2 sm:px-4 transition-all duration-1000 ease-out w-full ${
+            className={`space-y-2 sm:space-y-3 mb-5 sm:mb-8 max-w-4xl px-2 sm:px-4 transition-all duration-1000 ease-out w-full ${
               introStep >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
             }`}
           >
-            <h1 className="font-editorial text-2xl xs:text-3xl sm:text-6xl md:text-7xl font-medium tracking-[0.06em] xs:tracking-[0.1em] sm:tracking-[0.16em] text-[#073B5C] uppercase leading-tight sm:leading-none break-words">
+            <h1 className="font-editorial text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-medium tracking-[0.08em] xs:tracking-[0.1em] sm:tracking-[0.14em] text-[#073B5C] uppercase leading-tight sm:leading-none whitespace-nowrap">
               PHARMACEUTICAL
               <span className="block text-[#00B4D8] font-normal italic lowercase text-xl xs:text-2xl sm:text-4xl md:text-5xl mt-1.5 sm:mt-2 tracking-normal font-editorial">
                 formulation & marketing
