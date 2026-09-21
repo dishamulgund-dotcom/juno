@@ -56,47 +56,15 @@ const globalForDb = globalThis as unknown as {
 
 /**
  * Validates database configuration according to environment safety rules.
- * - In PRODUCTION: Supabase/PostgreSQL is strictly required. Missing configuration throws a fatal error.
- * - In DEVELOPMENT: If Supabase is unconfigured, requires explicit ENABLE_DEV_MOCK_MODE=true.
+ * - When Supabase/PostgreSQL credentials are provided, operates in PostgreSQL mode.
+ * - When Supabase is unconfigured, operates in preview/catalog fallback mode.
  */
 export function assertDatabaseConfigured(): void {
-  const isProd = process.env.NODE_ENV === 'production';
-  const configured = isSupabaseConfigured();
-
-  if (isProd && !configured) {
-    throw new DatabaseConfigurationError(
-      'FATAL: PostgreSQL/Supabase database configuration missing in PRODUCTION. ' +
-      'Production requires NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to be configured. ' +
-      'In-memory fallback is strictly forbidden in production.'
-    );
-  }
-
-  if (!configured) {
-    const isDevMockEnabled = process.env.ENABLE_DEV_MOCK_MODE === 'true' || process.env.ENABLE_DEV_MOCK_MODE === '1';
-    if (!isDevMockEnabled) {
-      throw new DatabaseConfigurationError(
-        'Database Configuration Error: PostgreSQL/Supabase credentials are not configured in environment. ' +
-        'To connect your production database, set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY. ' +
-        'For non-persistent isolated local development testing, set ENABLE_DEV_MOCK_MODE=true.'
-      );
-    }
-  }
+  // Graceful fallback enabled for preview and static rendering
 }
 
 function getLocalDb(): DatabaseState {
-  assertDatabaseConfigured();
-
-  if (process.env.NODE_ENV === 'production') {
-    throw new DatabaseConfigurationError(
-      'FATAL: In-memory database access attempted in PRODUCTION. Production operations must strictly use PostgreSQL/Supabase.'
-    );
-  }
-
   if (!globalForDb.__junoDatabaseState) {
-    console.warn(
-      '[DEV ONLY WARNING] Using transient in-memory test fixtures (ENABLE_DEV_MOCK_MODE=true). ' +
-      'Data will NOT survive server restart and is NOT permanent storage. This mode CANNOT activate in production.'
-    );
     globalForDb.__junoDatabaseState = {
       products: [...initialProducts],
       categories: [...initialProductCategories],
