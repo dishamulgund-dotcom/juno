@@ -157,6 +157,17 @@ export default function ButterflySignature({ logoRef, isExiting = false, onPerch
       return;
     }
 
+    const isMobile = window.innerWidth < 768;
+    const waitDuration = isMobile ? 600 : 1200;
+    const flightDuration = isMobile ? 1300 : 2600;
+    const settleDuration = isMobile ? 200 : 400;
+    const flightEndTime = waitDuration + flightDuration;
+    const settleEndTime = flightEndTime + settleDuration;
+
+    const arc1 = isMobile ? 22 : 55;
+    const arc2 = isMobile ? 12 : 30;
+    const flutterAmp = isMobile ? 4.5 : 11;
+
     const startX = Math.max(25, window.innerWidth * 0.1);
     const startY = Math.max(50, window.innerHeight * 0.16);
 
@@ -179,12 +190,12 @@ export default function ButterflySignature({ logoRef, isExiting = false, onPerch
       }
 
       // TIMELINE:
-      // 0 - 1200ms: Background & title emerge, butterfly waiting
-      // 1200ms - 3800ms: Natural curved aerodynamic flight to JUNO logo
-      // 3800ms - 4200ms: Touchdown on 'N' motif
-      // 4200ms+: PERCHED inside logo container permanently
+      // 0 to waitDuration: Background & title emerge, butterfly waiting
+      // waitDuration to flightEndTime: Natural curved aerodynamic flight to JUNO logo
+      // flightEndTime to settleEndTime: Touchdown on 'N' motif
+      // settleEndTime+: PERCHED inside logo container permanently
 
-      if (elapsed < 1200) {
+      if (elapsed < waitDuration) {
         setPos({
           x: startX,
           y: startY,
@@ -196,19 +207,18 @@ export default function ButterflySignature({ logoRef, isExiting = false, onPerch
         return;
       }
 
-      if (elapsed >= 1200 && elapsed < 3800) {
+      if (elapsed >= waitDuration && elapsed < flightEndTime) {
         if (stage !== 'flying') setStage('flying');
 
-        const flightDuration = 2600;
-        const progress = (elapsed - 1200) / flightDuration;
+        const progress = (elapsed - waitDuration) / flightDuration;
 
         const ease = progress < 0.5
           ? 4 * progress * progress * progress
           : 1 - Math.pow(-2 * progress + 2, 3) / 2;
 
         const p0 = { x: startX, y: startY };
-        const p1 = { x: startX + (target.x - startX) * 0.35, y: Math.min(startY, target.y) - 55 };
-        const p2 = { x: startX + (target.x - startX) * 0.75, y: target.y - 30 };
+        const p1 = { x: startX + (target.x - startX) * 0.35, y: Math.min(startY, target.y) - arc1 };
+        const p2 = { x: startX + (target.x - startX) * 0.75, y: target.y - arc2 };
         const p3 = target;
 
         const t = ease;
@@ -219,7 +229,7 @@ export default function ButterflySignature({ logoRef, isExiting = false, onPerch
         const ttt = tt * t;
 
         const bx = uuu * p0.x + 3 * uu * t * p1.x + 3 * u * tt * p2.x + ttt * p3.x;
-        const flutterSine = Math.sin((elapsed - 1200) * 0.014) * (11 * (1 - ease));
+        const flutterSine = Math.sin((elapsed - waitDuration) * 0.014) * (flutterAmp * (1 - ease));
         const by = uuu * p0.y + 3 * uu * t * p1.y + 3 * u * tt * p2.y + ttt * p3.y + flutterSine;
 
         const nextT = Math.min(1, t + 0.02);
@@ -247,7 +257,7 @@ export default function ButterflySignature({ logoRef, isExiting = false, onPerch
         return;
       }
 
-      if (elapsed >= 3800 && elapsed < 4200) {
+      if (elapsed >= flightEndTime && elapsed < settleEndTime) {
         if (stage !== 'settling') setStage('settling');
 
         setPos({
@@ -262,7 +272,7 @@ export default function ButterflySignature({ logoRef, isExiting = false, onPerch
         return;
       }
 
-      // 4200ms+: Touchdown complete -> hand off to embedded logo butterfly!
+      // Touchdown complete -> hand off to embedded logo butterfly!
       setStage('perched');
       onPerched?.();
     };
