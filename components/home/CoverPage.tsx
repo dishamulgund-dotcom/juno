@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { ArrowRight, ShieldCheck, Phone, Mail, Globe } from 'lucide-react';
-import ButterflySignature from './ButterflySignature';
+import ButterflySignature, { ButterflyGraphic } from './ButterflySignature';
 import MolecularDepthCanvas from './MolecularDepthCanvas';
 
 interface CoverPageProps {
@@ -14,6 +14,7 @@ export default function CoverPage({ onEnter }: CoverPageProps) {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isExiting, setIsExiting] = useState(false);
   const [introStep, setIntroStep] = useState(0);
+  const [isButterflyPerched, setIsButterflyPerched] = useState(false);
   const logoRef = useRef<HTMLDivElement | null>(null);
 
   // Subtle mouse tracking for gentle parallax
@@ -91,7 +92,11 @@ export default function CoverPage({ onEnter }: CoverPageProps) {
       <MolecularDepthCanvas mousePos={mousePos} isExiting={isExiting} />
 
       {/* Signature Butterfly (Flies strictly ONCE on page load, lands, and stays permanently) */}
-      <ButterflySignature logoRef={logoRef} isExiting={isExiting} />
+      <ButterflySignature 
+        logoRef={logoRef} 
+        isExiting={isExiting} 
+        onPerched={() => setIsButterflyPerched(true)} 
+      />
 
       {/* =========================================================================
           2. CORPORATE STATUTORY HEADER BAR (STRONG CONTRAST & CLEAR READABILITY)
@@ -145,6 +150,21 @@ export default function CoverPage({ onEnter }: CoverPageProps) {
                 sizes="(max-width: 640px) 300px, (max-width: 768px) 440px, 490px"
                 className="object-contain drop-shadow-[0_4px_16px_rgba(7,59,92,0.1)]"
               />
+
+              {/* Perched butterfly physically anchored inside logo container — 100% synchronized with scroll */}
+              {isButterflyPerched && (
+                <div 
+                  className="absolute pointer-events-none z-20 transition-opacity duration-500 animate-fade-in"
+                  style={{
+                    left: '68%',
+                    top: '12%',
+                    transform: 'translate(-50%, -50%) rotate(-6deg)'
+                  }}
+                  aria-hidden="true"
+                >
+                  <ButterflyGraphic isFlapping={false} isMicroFlutter={true} />
+                </div>
+              )}
             </div>
           </div>
 
