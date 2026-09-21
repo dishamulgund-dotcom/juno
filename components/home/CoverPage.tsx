@@ -207,30 +207,30 @@ export default function CoverPage({ onEnter }: CoverPageProps) {
           </span>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center sm:justify-end gap-3 sm:gap-6 text-[10px] sm:text-[12px]">
+        <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2.5 sm:gap-6 text-[10px] sm:text-[12px]">
           {/* Official Phone */}
           <a 
             href="tel:+919743094555" 
-            className="hover:text-[#00B4D8] transition-colors flex items-center gap-1.5 uppercase tracking-[0.1em] sm:tracking-[0.15em] font-bold text-[#073B5C]"
+            className="hover:text-[#00B4D8] transition-colors flex items-center gap-1.5 uppercase tracking-[0.1em] sm:tracking-[0.15em] font-bold text-[#073B5C] whitespace-nowrap"
           >
-            <Phone className="w-3.5 h-3.5 text-[#00B4D8]" />
-            <span>+91 9743094555</span>
+            <Phone className="w-3.5 h-3.5 text-[#00B4D8] shrink-0" />
+            <span className="whitespace-nowrap">+91 9743094555</span>
           </a>
 
-          <span className="text-[#073B5C]/35">•</span>
+          <span className="text-[#073B5C]/35 hidden xs:inline">•</span>
 
           {/* Business Focus / Medicine Marketing */}
-          <span className="text-[#073B5C] flex items-center gap-1.5 uppercase tracking-[0.1em] sm:tracking-[0.15em] font-bold">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#00B4D8]" />
-            <span>MEDICINE MARKETING</span>
+          <span className="text-[#073B5C] flex items-center gap-1.5 uppercase tracking-[0.1em] sm:tracking-[0.15em] font-bold whitespace-nowrap">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#00B4D8] shrink-0" />
+            <span className="whitespace-nowrap">MEDICINE MARKETING</span>
           </span>
 
-          <span className="text-[#073B5C]/35">•</span>
+          <span className="text-[#073B5C]/35 hidden sm:inline">•</span>
 
           {/* Official Website */}
-          <span className="text-[#073B5C] flex items-center gap-1.5 uppercase tracking-[0.1em] sm:tracking-[0.15em] font-bold">
-            <Globe className="w-3.5 h-3.5 text-[#00B4D8]" />
-            <span>JUNOHEALTHCARE.IN</span>
+          <span className="text-[#073B5C] flex items-center gap-1.5 uppercase tracking-[0.1em] sm:tracking-[0.15em] font-bold whitespace-nowrap">
+            <Globe className="w-3.5 h-3.5 text-[#00B4D8] shrink-0" />
+            <span className="whitespace-nowrap">JUNOHEALTHCARE.IN</span>
           </span>
         </div>
       </footer>

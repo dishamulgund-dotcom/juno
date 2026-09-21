@@ -67,11 +67,12 @@ export default function HomeClient({
 
       <div className="flex flex-col min-h-screen animate-fade-in">
       {/* Return to Cover Page Mini Floating Action */}
-      <div className="fixed bottom-6 right-6 z-40">
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-30 pointer-events-auto">
         <button
           onClick={handleReturnToCover}
-          className="flex items-center gap-2 px-3.5 py-2 bg-[#073B5C]/90 hover:bg-[#073B5C] text-white text-xs font-bold rounded-full shadow-lg border border-[#16B8B3]/30 backdrop-blur-xs transition-all hover:scale-105"
+          className="hidden sm:flex items-center gap-2 px-3.5 py-2 bg-[#073B5C]/90 hover:bg-[#073B5C] text-white text-xs font-bold rounded-full shadow-lg border border-[#16B8B3]/30 backdrop-blur-xs transition-all hover:scale-105 cursor-pointer"
           title="Return to Scientific Cover Page"
+          aria-label="Return to Cover Page"
         >
           <Sparkles className="w-3.5 h-3.5 text-[#48D4D2]" />
           <span>Cover View</span>

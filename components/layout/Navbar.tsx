@@ -48,31 +48,31 @@ export default function Navbar() {
   return (
     <>
       {/* Statutory Corporate Top Bar */}
-      <div className="bg-[#073B5C] text-[#F3F9FB] text-xs py-1.5 px-4 sm:px-6 border-b border-[#0B4C74]">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 text-[#48D4D2] font-mono text-[11px]">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#48D4D2]" />
-              CIN: U46497MR2026PTC474137
+      <div className="bg-[#073B5C] text-[#F3F9FB] text-xs py-1.5 px-3 sm:px-6 border-b border-[#0B4C74]">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <span className="inline-flex items-center gap-1.5 text-[#48D4D2] font-mono text-[10px] sm:text-[11px] whitespace-nowrap">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#48D4D2] shrink-0" />
+              <span>CIN: U46497MR2026PTC474137</span>
             </span>
             <span className="hidden md:inline text-[#16B8B3]/50">|</span>
-            <span className="hidden md:inline text-[#F3F9FB]/80 text-[11px]">
+            <span className="hidden md:inline text-[#F3F9FB]/80 text-[11px] whitespace-nowrap">
               ROC Mumbai II • Inc. 06/03/2026
             </span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
             <a 
               href="tel:+919743094555" 
-              className="flex items-center gap-1.5 text-[#F3F9FB] hover:text-[#48D4D2] transition-colors"
+              className="flex items-center gap-1.5 text-[#F3F9FB] hover:text-[#48D4D2] transition-colors whitespace-nowrap text-[10px] sm:text-xs"
             >
-              <Phone className="w-3 h-3 text-[#48D4D2]" />
-              <span className="font-semibold">+91 9743094555</span>
+              <Phone className="w-3 h-3 text-[#48D4D2] shrink-0" />
+              <span className="font-semibold whitespace-nowrap tracking-wider">+91 9743094555</span>
             </a>
             <Link 
               href="/admin/login" 
-              className="text-[11px] text-[#48D4D2] hover:text-white transition-colors flex items-center gap-1"
+              className="hidden sm:flex text-[11px] text-[#48D4D2] hover:text-white transition-colors items-center gap-1 whitespace-nowrap"
             >
-              <Lock className="w-3 h-3" />
+              <Lock className="w-3 h-3 shrink-0" />
               <span>Admin Portal</span>
             </Link>
           </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useId } from 'react';
+import React, { useState, useEffect, useRef, useId, useCallback } from 'react';
 
 interface ButterflySignatureProps {
   logoRef: React.RefObject<HTMLDivElement | null>;
@@ -8,7 +8,7 @@ interface ButterflySignatureProps {
 }
 
 export default function ButterflySignature({ logoRef, isExiting = false }: ButterflySignatureProps) {
-  // States: 'waiting' (0-1.8s) -> 'flying' (1.8s-4.5s) -> 'settling' (4.5s-5.0s) -> 'perched' (5.0s+)
+  // States: 'waiting' (0-1.5s) -> 'flying' (1.5s-4.0s) -> 'settling' (4.0s-4.5s) -> 'perched' (4.5s+)
   const [stage, setStage] = useState<'waiting' | 'flying' | 'settling' | 'perched'>('waiting');
   const [isMicroFlutter, setIsMicroFlutter] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
@@ -30,6 +30,22 @@ export default function ButterflySignature({ logoRef, isExiting = false }: Butte
   const gradId1 = useId();
   const gradId2 = useId();
 
+  // Helper to compute target position of butterfly motif atop 'N' in JUNO logo
+  const getTargetCoords = useCallback(() => {
+    if (logoRef.current) {
+      const rect = logoRef.current.getBoundingClientRect();
+      // Butterfly motif is situated atop 'N' in the JUNO logo
+      return {
+        x: rect.left + rect.width * 0.68,
+        y: rect.top + rect.height * 0.12
+      };
+    }
+    return {
+      x: window.innerWidth * 0.5 + (window.innerWidth < 640 ? 55 : 85),
+      y: window.innerHeight * 0.35
+    };
+  }, [logoRef]);
+
   // Check prefers-reduced-motion
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -40,53 +56,59 @@ export default function ButterflySignature({ logoRef, isExiting = false }: Butte
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
-  // Compute exact coordinates of butterfly motif in JUNO logo
+  // Continuous Scroll & Resize Synchronisation — Keeps butterfly locked to logo at all times
   useEffect(() => {
-    const updateTarget = () => {
-      if (logoRef.current) {
-        const rect = logoRef.current.getBoundingClientRect();
-        // The butterfly motif in JUNO logo is situated right over the letter 'N' (approx 68% from left, 12% from top)
-        restingTargetRef.current = {
-          x: rect.left + rect.width * 0.68,
-          y: rect.top + rect.height * 0.12
-        };
-      } else {
-        restingTargetRef.current = {
-          x: window.innerWidth * 0.5 + (window.innerWidth < 640 ? 55 : 85),
-          y: window.innerHeight * 0.38 - (window.innerWidth < 640 ? 25 : 35)
-        };
+    const handleScrollOrResize = () => {
+      const target = getTargetCoords();
+      restingTargetRef.current = target;
+
+      // If already perched, immediately update screen coordinates so it moves seamlessly with scroll
+      if (hasFinishedFlightRef.current) {
+        setPos({
+          x: target.x,
+          y: target.y,
+          angle: -6,
+          scale: 1,
+          opacity: 1
+        });
       }
     };
 
-    updateTarget();
-    window.addEventListener('resize', updateTarget);
-    return () => window.removeEventListener('resize', updateTarget);
-  }, [logoRef]);
+    window.addEventListener('scroll', handleScrollOrResize, { passive: true });
+    window.addEventListener('resize', handleScrollOrResize, { passive: true });
+    
+    // Initial calculate
+    handleScrollOrResize();
+
+    return () => {
+      window.removeEventListener('scroll', handleScrollOrResize);
+      window.removeEventListener('resize', handleScrollOrResize);
+    };
+  }, [getTargetCoords]);
 
   // Track cursor position for subtle in-place micro-flutter
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       mousePosRef.current = { x: e.clientX, y: e.clientY };
 
-      // If already perched, check proximity for micro wing tilt ONLY (no position change)
       if (hasFinishedFlightRef.current) {
         const target = restingTargetRef.current;
         const dx = target.x - e.clientX;
         const dy = target.y - e.clientY;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        setIsMicroFlutter(dist < 90);
+        setIsMicroFlutter(dist < 80);
       }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // ONE-TIME Butterfly Flight Animation Loop
+  // ONE-TIME Graceful Butterfly Flight Animation Loop
   useEffect(() => {
     if (prefersReducedMotion) {
-      // If reduced motion, immediately place butterfly at resting position without flight
-      const target = restingTargetRef.current;
+      const target = getTargetCoords();
+      restingTargetRef.current = target;
       setPos({
         x: target.x,
         y: target.y,
@@ -99,39 +121,39 @@ export default function ButterflySignature({ logoRef, isExiting = false }: Butte
       return;
     }
 
-    const startX = Math.max(30, window.innerWidth * 0.12);
-    const startY = Math.max(70, window.innerHeight * 0.22);
+    const startX = Math.max(25, window.innerWidth * 0.1);
+    const startY = Math.max(50, window.innerHeight * 0.18);
 
     const animate = (timestamp: number) => {
       if (!startTimeRef.current) startTimeRef.current = timestamp;
       const elapsed = timestamp - startTimeRef.current;
-      const target = restingTargetRef.current;
+      const target = getTargetCoords();
+      restingTargetRef.current = target;
 
       if (isExiting) {
         // Smooth ascension on platform entry
         setPos(prev => ({
-          x: prev.x + 1.2,
-          y: prev.y - 2.5,
-          angle: -30,
+          x: prev.x + 1.5,
+          y: prev.y - 2.8,
+          angle: -25,
           scale: Math.max(0.2, prev.scale - 0.015),
-          opacity: Math.max(0, prev.opacity - 0.03)
+          opacity: Math.max(0, prev.opacity - 0.035)
         }));
         animFrameRef.current = requestAnimationFrame(animate);
         return;
       }
 
       // TIMELINE:
-      // STEP 1 & 2 (0.0 - 2.0s): Background & all main content (JUNO Logo, Headings, Quote, CTA, surrounding corporate metadata) appear first. Butterfly is waiting (opacity: 0).
-      // STEP 3 (2.0 - 4.7s): Single curved Bezier flight to JUNO logo
-      // STEP 4 (4.7 - 5.1s): Gentle settle & wing touchdown on butterfly motif in JUNO logo
-      // STEP 5 (5.1s+): PERCHED FOREVER. Flight NEVER repeats, no loops, no hover restarts.
+      // 0 - 1500ms: Background & content reveal, butterfly waiting
+      // 1500ms - 4200ms: Graceful curved flight to JUNO logo
+      // 4200ms - 4600ms: Gentle touchdown & settling
+      // 4600ms+: PERCHED on logo (locked to scroll)
 
-      if (elapsed < 2000) {
-        // Waiting state (invisible while main content reveals)
+      if (elapsed < 1500) {
         setPos({
           x: startX,
           y: startY,
-          angle: 15,
+          angle: 12,
           scale: 0.85,
           opacity: 0
         });
@@ -139,25 +161,23 @@ export default function ButterflySignature({ logoRef, isExiting = false }: Butte
         return;
       }
 
-      if (elapsed >= 2000 && elapsed < 4700) {
-        // SINGLE CURVED FLIGHT
+      if (elapsed >= 1500 && elapsed < 4200) {
         if (stage !== 'flying') setStage('flying');
 
-        const flightDuration = 2700; // 2000ms to 4700ms
-        const progress = (elapsed - 2000) / flightDuration;
+        const flightDuration = 2700;
+        const progress = (elapsed - 1500) / flightDuration;
 
-        // Cubic easeInOut with natural deceleration approaching the logo
+        // Smooth cubic ease out
         const ease = progress < 0.5
           ? 4 * progress * progress * progress
           : 1 - Math.pow(-2 * progress + 2, 3) / 2;
 
-        // Spline control points for an organic curved flight
+        // Elegant curved Bezier flight path
         const p0 = { x: startX, y: startY };
-        const p1 = { x: startX + window.innerWidth * 0.28, y: startY - 70 };
-        const p2 = { x: target.x - 70, y: target.y + 65 };
+        const p1 = { x: startX + (target.x - startX) * 0.35, y: Math.min(startY, target.y) - 50 };
+        const p2 = { x: startX + (target.x - startX) * 0.75, y: target.y - 30 };
         const p3 = target;
 
-        // Cubic Bezier calculation
         const t = ease;
         const u = 1 - t;
         const tt = t * t;
@@ -166,20 +186,20 @@ export default function ButterflySignature({ logoRef, isExiting = false }: Butte
         const ttt = tt * t;
 
         const bx = uuu * p0.x + 3 * uu * t * p1.x + 3 * u * tt * p2.x + ttt * p3.x;
-        const verticalSine = Math.sin((elapsed - 2000) * 0.009) * (14 * (1 - ease));
-        const by = uuu * p0.y + 3 * uu * t * p1.y + 3 * u * tt * p2.y + ttt * p3.y + verticalSine;
+        const flutterSine = Math.sin((elapsed - 1500) * 0.01) * (10 * (1 - ease));
+        const by = uuu * p0.y + 3 * uu * t * p1.y + 3 * u * tt * p2.y + ttt * p3.y + flutterSine;
 
-        // Calculate heading angle
-        const nextT = Math.min(1, t + 0.015);
+        // Natural rotation heading towards flight tangent
+        const nextT = Math.min(1, t + 0.02);
         const nextU = 1 - nextT;
         const nbx = (nextU*nextU*nextU)*p0.x + 3*(nextU*nextU)*nextT*p1.x + 3*nextU*(nextT*nextT)*p2.x + (nextT*nextT*nextT)*p3.x;
         const nby = (nextU*nextU*nextU)*p0.y + 3*(nextU*nextU)*nextT*p1.y + 3*nextU*(nextT*nextT)*p2.y + (nextT*nextT*nextT)*p3.y;
-        
+
         const dx = nbx - bx;
         const dy = nby - by;
         let angle = Math.atan2(dy, dx) * (180 / Math.PI);
-        if (progress > 0.8) {
-          const blend = (progress - 0.8) / 0.2;
+        if (progress > 0.75) {
+          const blend = (progress - 0.75) / 0.25;
           angle = angle * (1 - blend) + (-6) * blend;
         }
 
@@ -188,15 +208,14 @@ export default function ButterflySignature({ logoRef, isExiting = false }: Butte
           y: by,
           angle: angle,
           scale: 0.85 + ease * 0.15,
-          opacity: Math.min(1, progress * 4) // Fade in smoothly
+          opacity: Math.min(1, progress * 3.5)
         });
 
         animFrameRef.current = requestAnimationFrame(animate);
         return;
       }
 
-      if (elapsed >= 4700 && elapsed < 5100) {
-        // SETTLING STATE (gentle touchdown on JUNO)
+      if (elapsed >= 4200 && elapsed < 4600) {
         if (stage !== 'settling') setStage('settling');
 
         setPos({
@@ -211,7 +230,7 @@ export default function ButterflySignature({ logoRef, isExiting = false }: Butte
         return;
       }
 
-      // 5100ms+ : FULLY PERCHED & STATIC. Animation Complete!
+      // 4600ms+: PERCHED & SYNCHRONIZED
       hasFinishedFlightRef.current = true;
       if (stage !== 'perched') setStage('perched');
 
@@ -223,7 +242,7 @@ export default function ButterflySignature({ logoRef, isExiting = false }: Butte
         opacity: 1
       });
 
-      // Continue minimal loop solely to maintain coordinates on resize or exit
+      // Keep animation frame running if exiting
       if (isExiting) {
         animFrameRef.current = requestAnimationFrame(animate);
       }
@@ -234,10 +253,9 @@ export default function ButterflySignature({ logoRef, isExiting = false }: Butte
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
-  }, [isExiting, prefersReducedMotion]);
+  }, [isExiting, prefersReducedMotion, getTargetCoords]);
 
   const isFlapping = stage === 'flying' || stage === 'settling';
-  const isPerched = stage === 'perched';
 
   if (pos.opacity === 0) return null;
 
@@ -252,10 +270,10 @@ export default function ButterflySignature({ logoRef, isExiting = false }: Butte
       }}
       aria-hidden="true"
     >
-      <div className="relative w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center filter drop-shadow-[0_2px_8px_rgba(22,184,179,0.35)]">
-        {/* Soft subtle glow during initial flight */}
+      <div className="relative w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center filter drop-shadow-[0_2px_8px_rgba(22,184,179,0.35)]">
+        {/* Soft subtle glow during flight */}
         {isFlapping && (
-          <div className="absolute inset-0 -z-10 rounded-full bg-[#48D4D2]/20 blur-sm animate-ping" />
+          <div className="absolute inset-0 -z-10 rounded-full bg-[#48D4D2]/25 blur-sm animate-ping" />
         )}
 
         <svg
